@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Inventory Tracker v2</title>
+    <link rel="icon" type="image/x-icon" href="static/img/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='inventorystyles.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Save button click handler
+            $('.btn-save').click(function() {
+                var id = $(this).data('id');
+                var name = $('td:eq(1)', $(this).parent().parent()).text();
+                var price = $('td:eq(2)', $(this).parent().parent()).text();
+                
+                $.ajax({
+                    url: '/update_item',
+                    method: 'POST',
+                    data: {
+                        id: id,
+                        name: name,
+                        price: price,
+                    },
+                    success: function(response) {
+                        alert(response);
+                    },
+                    error: function(xhr) {
+                        alert('Error: ' + xhr.status + ' ' + xhr.statusText);
+                    }
+                });
+            });
+
+            // Delete button click handler
+            $('.btn-delete').click(function() {
+                var id = $(this).data('id');
+                if (confirm('Are you sure you want to delete this item?')) {
+                    $.ajax({
+                        url: '/delete_item',
+                        method: 'POST',
+                        data: {
+                            id: id
+                        },
+                        success: function(response) {
+                            $('#item-' + id).remove();
+                            alert(response);
+                        },
+                        error: function(xhr) {
+                            alert('Error: ' + xhr.status + ' ' + xhr.statusText);
+                        }
+                    });
+                }
+            });
+
+            // Add button click handler
+            $('#btn-add').click(function() {
+                window.location.href = '{{ url_for("add_item") }}';
+            });
+        });
+    </script>
+  </head>
+  <body>
+    <h1>Inventory</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+        {% for item in inventorylist %}
+        <tr>
+            <td>{{ item.id }}</td>
+            <td contenteditable="true">{{ item.name }}</td>
+            <td contenteditable="true">{{ item.price }}</td>
+            <td>
+                <button class="btn-save" data-id="{{ item.id }}">Save</button>
+                <button class="btn-delete" data-id="{{ item.id }}">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+</body>
+</html>

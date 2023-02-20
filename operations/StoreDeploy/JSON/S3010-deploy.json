@@ -1,0 +1,144 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string"
+        },
+        "Customlocationid": {
+            "type": "string"
+        },
+        "provisionedClustersname": {
+            "type": "String"
+        },
+        "virtualNetworks_customresource_id": {
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.HybridContainerService/provisionedClusters",
+            "apiVersion": "2022-05-01-preview",
+            "name": "[parameters('provisionedClustersname')]",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('Customlocationid')]"
+            },
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "aadProfile": {
+                    "adminGroupObjectIDs": [
+                        "c0715266-92f2-4615-bb25-20f984daaebe"
+                    ]
+                },
+                "linuxProfile": {
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCHxvNXGHr+r3WprExHuA3BnQ6pW526w9mH+RbRY2m+HjYpdQVL6od6r3UYZ6I40EdkozgwJvmDIcXnhHl7A/mQ7ZmYEQ+tyJsBEhAwHneYLdyJlGuZNQ+NXix5NLRlF8tPMKDxUJ3TVUJshwY3mk+gbXwdWBlFt4ZY7NRA9SvO6kfildzPdzyrp6xNYB71zl5TfWaAOCPorkkzVor/f/ju1uajzz8zuHS7cXl2w681X/ufRk3pSSPqobSGXOXn/hLlomXt48q9E73aBgWRpVSIY6zq2fKiyL855To7Cjfz7GmZsjRYeytP4Ls5bkWppiaBOulrakg8jQChE+ZNwXn"
+                            }
+                        ]
+                    }
+                },
+                "features": {
+                    "arcAgentProfile": {
+                        "agentAutoUpgrade": "Enabled"
+                    }
+                },
+                "controlPlane": {
+                    "controlPlaneEndpoint": {},
+                    "count": 1,
+                    "mode": "User",
+                    "osType": "Linux",
+                    "vmSize": "Standard_A4_v2",
+                    "cloudProviderProfile": {
+                        "infraNetworkProfile": {},
+                        "infraStorageProfile": {}
+                    },
+                    "linuxProfile": {
+                        "ssh": {}
+                    }
+                },
+                "kubernetesVersion": "v1.22.11",
+                "networkProfile": {
+                    "loadBalancerProfile": {
+                        "count": 1,
+                        "mode": "User",
+                        "osType": "Linux",
+                        "vmSize": "Standard_K8S3_v1",
+                        "cloudProviderProfile": {
+                            "infraNetworkProfile": {},
+                            "infraStorageProfile": {}
+                        },
+                        "linuxProfile": {
+                            "ssh": {}
+                        }
+                    },
+                    "loadBalancerSku": "unstacked-haproxy",
+                    "networkPolicy": "calico",
+                    "podCidr": "10.244.0.0/16"
+                },
+                "agentPoolProfiles": [
+                    {
+                        "cloudProviderProfile": {
+                            "infraNetworkProfile": {},
+                            "infraStorageProfile": {}
+                        },
+                        "count": 1,
+                        "mode": "User",
+                        "osType": "Linux",
+                        "vmSize": "Standard_A4_v2"
+                    }
+                ],
+                "cloudProviderProfile": {
+                    "infraNetworkProfile": {
+                        "vnetSubnetIds": [
+                            "[parameters('virtualNetworks_customresource_id')]"
+                        ]
+                    },
+                    "infraStorageProfile": {}
+                },
+                "httpProxyConfig": {},
+                "windowsProfile": {}
+            }
+        },
+        {
+            "type": "Microsoft.HybridContainerService/provisionedClusters/agentPools",
+            "apiVersion": "2022-05-01-preview",
+            "name": "[concat(parameters('provisionedClustersname'), '/', parameters('provisionedClustersname'), '-nodepool1')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.HybridContainerService/provisionedClusters', parameters('provisionedClustersname'))]"
+            ],
+            "properties": {
+                "cloudProviderProfile": {
+                    "infraNetworkProfile": {},
+                    "infraStorageProfile": {}
+                },
+                "count": 1,
+                "mode": "User",
+                "osType": "Linux",
+                "vmSize": "Standard_A4_v2"
+            }
+        },
+        {
+            "type": "Microsoft.HybridContainerService/provisionedClusters/hybridIdentityMetadata",
+            "apiVersion": "2022-05-01-preview",
+            "name": "[concat(parameters('provisionedClustersname'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.HybridContainerService/provisionedClusters', parameters('provisionedClustersname'))]"
+            ],
+            "properties": {
+                "identity": {
+                    "type": "SystemAssigned"
+                },
+                "resourceUid": "00000000-0000-0000-0000-000000000000",
+                "publicKey": "MIICCgKCAgEAulHs9O/9GcxsRBXHH3mXzu6F2s8L9uoIZXcL+JrZsQsLa63HOfOrMD8qnden00n3dlkMrns4Mq10OVeRfPJuNbB5AVqD7CJs0ASH/kQv/LLS21DRwwk0iXCCuQarOWJwK+CAYXFjbMoJwL23ksxLIy8O/YIghfSATlaAs74GVDB4k7HG39KkoMoqI8ROfbMx/rdOIslcPZ/kLCYk+0PLhJ7r1ZcpeIPwzNcPxwdBcyz3JfVzTdqFanJX5RtYweQkQAeX3LTfgpZoz9LVQUj/h8zZe0xjNIs/5QJfBbpHBa3JYwvQ76VSZo3Js6w9hJXrs9exAYibFLlYE4z49lKi1iHxwcPU75TomNjU1DHI4p+uZt4Bk8HWDfwcJXHS0atSBPX8e5YNztV3oc8n6VrV/iwj6nCLL7m18io6iQ1z87qKWXViNZ8VAP6n7RXkGuWdiffektzbjLThJtEJEyTZCpRJ13paUmLqV2kKUs0c4lZAezAbQKRy0u9HXRHaghbPisl1yGY1b0kFbWEFsJE89hLgK10yR2WzOpdrLGRR5bjZJAN2R7WqHRmWlkBFRamh2CViZMrLQInJXcb0TynvIKOWJRt1Q3e1m/0K14P4EstmVUm41zCkmbe0aNCtkU9/Jd7Smta9y2ls2sAAMNzcD5Z9hl20I8xuyswnfcW1brsCAwEAAQ=="
+            }
+        }
+    ]
+}
