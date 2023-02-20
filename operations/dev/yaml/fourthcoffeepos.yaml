@@ -1,0 +1,74 @@
+# ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fourthcoffee-config
+data:
+  DBNAME: "127.0.0.1"
+  DBUSER: root
+  DBSECRET: secret
+  DBNAME: fourthcoffee
+---
+# Create Contoso Supermarket Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: fourthcoffeepos
+  namespace: fourthcoffeepos
+  labels:
+    app: fourthcoffeepos
+    env: dev
+spec:
+  selector:
+    app: fourthcoffeepos
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fourthcoffee-db
+spec:
+  selector:
+    app: fourthcoffee
+  ports:
+  - name: mysql
+    port: 3306
+    targetPort: 3306
+---  
+# Create Contoso Supermarket Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fourthcoffeepos
+  namespace: fourthcoffeepos
+  labels:
+    app: fourthcoffeepos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fourthcoffeepos
+  template:
+    metadata:
+      labels:
+        app: fourthcoffeepos
+    spec:
+      containers:
+        - name: fourthcoffeepos
+          image: mgodfre3/contosoapps:17
+          envFrom:
+          - configMapRef:
+              name: fourthcoffee-config
+          ports:
+            - containerPort: 5000
+        - name: contosocameras
+          image: azurearcjumpstart.azurecr.io/contoso-supermarket-cameras:latest
+        - name: db
+          image: mysql:5.7
+          envFrom:
+          - configMapRef:
+              name: fourthcoffee-config

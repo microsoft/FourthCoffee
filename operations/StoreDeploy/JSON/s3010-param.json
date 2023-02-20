@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "provisionedClustersname":{
+            "value": "cafe-pos"
+        },
+        "location":{
+            "value": "eastus"
+        },
+        "Customlocationid":{
+            "value": "/subscriptions/0c6c3a0d-0866-4e68-939d-ef81ca6f802e/resourceGroups/s3010-aks/providers/Microsoft.ExtendedLocation/customLocations/s3010CL"
+        },
+        "virtualNetworks_customresource_id": {
+            "value": "/subscriptions/0c6c3a0d-0866-4e68-939d-ef81ca6f802e/resourceGroups/s3010-aks/providers/Microsoft.HybridContainerService/virtualNetworks/s3010-aks-default" 
+        },
+        "virtualNetworks_s4010cl_default_externalid": {
+            "value": null
+        }
+    }
+}
