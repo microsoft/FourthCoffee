@@ -5,15 +5,22 @@ import cv2
 from flask import Flask, render_template, Response, request, url_for, redirect
 from sqlConnector import SqlConnector
 import mysql.connector
+import socket
 
 app = Flask(__name__)
 
-mydb = mysql.connector.connect(
-    host=os.environ.get('DBHOST'),
-    user=os.environ.get('DBUSER'),
-    password=os.environ.get('DBSECRET'),
-    database=os.environ.get('DBNAME')
+static = os.environ.get("IS_STATIC")
+
+if(static == False):
+    mydb = mysql.connector.connect(
+        host=os.environ.get('DBHOST'),
+        user=os.environ.get('DBUSER'),
+        password=os.environ.get('DBSECRET'),
+        database=os.environ.get('DBNAME')
     )
+
+dbserver = host=os.environ.get('DBHOST')
+servername = socket.gethostname()
 
 @app.route('/')
 def index():
@@ -31,7 +38,28 @@ def index():
     if os.environ.get('NEW_CATEGORY'):
         holiday_season = os.environ.get('NEW_CATEGORY') == 'True'
 
-    return render_template('index2.html' if holiday_season else 'index.html', head_title = head_title, cameras_enabled = cameras_enabled)
+    mydb2 = mysql.connector.connect(
+        host=os.environ.get('DBHOST'),
+        user=os.environ.get('DBUSER'),
+        password=os.environ.get('DBSECRET'),
+        database=os.environ.get('DBNAME')
+    )
+    cur2 = mydb2.cursor()
+    productlist = []
+    query = "SELECT * from fourthcoffeedb.products"
+    cur2.execute(query)
+    for item in cur2.fetchall():
+        productlist.append({
+            'id': item[0],
+            'name': item[1],
+            'price': item[2],
+            'currentInventory': item[3],
+            'photolocation': item[4]
+        })
+    cur2.close()
+    
+    return render_template('index3.html', productlist=productlist, dbserver=dbserver, servername=servername)
+    #return render_template('index3.html' if holiday_season else 'index3.html', head_title = head_title, cameras_enabled = cameras_enabled)
 
 @app.route('/inventory')
 def inventory():
@@ -44,7 +72,7 @@ def inventory():
     try:
         cur2 = mydb2.cursor()
         inventorylist = []
-        query = "SELECT * from fourthcoffee.products"
+        query = "SELECT * from fourthcoffeedb.products"
         cur2.execute(query)
         for item in cur2.fetchall():
             inventorylist.append({
