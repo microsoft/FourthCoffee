@@ -11,13 +11,14 @@ app = Flask(__name__)
 
 static = os.environ.get("IS_STATIC")
 
-if(static == False):
-    mydb = mysql.connector.connect(
-        host=os.environ.get('DBHOST'),
-        user=os.environ.get('DBUSER'),
-        password=os.environ.get('DBSECRET'),
-        database=os.environ.get('DBNAME')
-    )
+
+mydb = mysql.connector.connect(
+    host=os.environ.get('DBHOST'),
+    user=os.environ.get('DBUSER'),
+    password=os.environ.get('DBSECRET'),
+    database=os.environ.get('DBNAME')
+)
+
 
 dbserver = host=os.environ.get('DBHOST')
 servername = socket.gethostname()
@@ -135,7 +136,7 @@ def update_item():
         price = float(request.form['price'])
 
         # Update item in database  
-        cur.execute("UPDATE products SET Name=%s, price=%s WHERE ProductId=%s", (name, price, item_id))
+        cur.execute("UPDATE products SET Name=%s, price=%s WHERE id=%s", (name, price, item_id))
         mydb.commit()
         cur.close()
 
@@ -153,7 +154,7 @@ def delete_item():
 
         # Delete item from database
         cur = mydb.cursor()
-        cur.execute("DELETE FROM products WHERE Productid=%s", (item_id,))
+        cur.execute("DELETE FROM products WHERE id=%s", (item_id,))
         mydb.commit()
         cur.close()
 

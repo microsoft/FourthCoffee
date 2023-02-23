@@ -19,13 +19,19 @@ spec:
         - containerPort: 5000
         env:
         - name: DBHOST
-          value: my-db
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-configmap
+              key: db_host
         - name: DBNAME
-          value: fourthcoffee
+          valueFrom: 
+            configMapKeyRef:
+              name: mysql-configmap
+              key: db_name
         - name: DBUSER
-          value: root
+          value: 
         - name: DBSECRET
-          value: secret
+          value: 
 ---
 apiVersion: v1
 kind: Service
@@ -58,16 +64,16 @@ spec:
     spec:
       containers:
       - name: db
-        image: mysql:5.7
-        env:
-        - name: MYSQL_DATABASE
-          value: fourthcoffee
-        - name: MYSQL_PASSWORD
-          value: secret
-        - name: MYSQL_ROOT_PASSWORD
-          value: secret
+        image: bcacr.azurecr.io/fourthcoffeedb/fourthcoffeedb:latest
         ports:
         - containerPort: 3306
+        volumeMounts:
+          - name: mysql-vol
+            mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-vol
+          hostPath:
+            path: /var/mysql-data
 ---
 apiVersion: v1
 kind: Service
