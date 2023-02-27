@@ -41,7 +41,7 @@ def index():
     if os.environ.get('NEW_CATEGORY'):
         holiday_season = os.environ.get('NEW_CATEGORY') == 'True'
 
-    season = "Summer"
+    season = ""
     if os.environ.get("SEASON"):
         season = os.environ.get("SEASON")
 

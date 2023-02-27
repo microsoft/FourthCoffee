@@ -5,8 +5,8 @@ metadata:
 data:
   db_host: my-db
   db_name: fourthcoffeedb
-  CAMERAS_ENABLED: False
-  head_title: "Fourth Coffee"
-  db_enabled: False
-  season: ""
+  CAMERAS_ENABLED: "False"
+  head_title: "El Jarocho"
+  db_enabled: "False"
+  season: "default"
 
