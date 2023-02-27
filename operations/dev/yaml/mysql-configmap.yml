@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mysql-configmap
-data:
-  db_host: my-db
-  db_name: fourthcoffeedb

@@ -21,13 +21,28 @@ spec:
         - name: DBHOST
           valueFrom:
             configMapKeyRef:
-              name: mysql-configmap
+              name: fc-configmap
               key: db_host
         - name: DBNAME
           valueFrom: 
             configMapKeyRef:
-              name: mysql-configmap
+              name: fc-configmap
               key: db_name
+        - name: head_title
+          valueFrom: 
+            configMapKeyRef:
+              name: fc-configmap
+              key: head_title
+        - name: DBENABLED
+          valueFrom: 
+            configMapKeyRef:
+              name: fc-configmap
+              key: db_enabled
+        - name: season
+          valueFrom: 
+            configMapKeyRef:
+              name: fc-configmap
+              key: season
         - name: DBUSER
           value: 
         - name: DBSECRET

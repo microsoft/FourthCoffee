@@ -9,18 +9,19 @@ import socket
 
 app = Flask(__name__)
 
-static = os.environ.get("IS_STATIC")
+dbenabled = os.environ.get("DBENABLED")
 
 
-mydb = mysql.connector.connect(
-    host=os.environ.get('DBHOST'),
-    user=os.environ.get('DBUSER'),
-    password=os.environ.get('DBSECRET'),
-    database=os.environ.get('DBNAME')
-)
+if dbenabled:
+    mydb = mysql.connector.connect(
+        host=os.environ.get('DBHOST'),
+        user=os.environ.get('DBUSER'),
+        password=os.environ.get('DBSECRET'),
+        database=os.environ.get('DBNAME')
+   )
 
 
-dbserver = host=os.environ.get('DBHOST')
+dbserver = os.environ.get('DBHOST')
 servername = socket.gethostname()
 
 @app.route('/')
@@ -36,31 +37,45 @@ def index():
         head_title = os.environ.get('HEAD_TITLE')
 
     holiday_season = False
+    
     if os.environ.get('NEW_CATEGORY'):
         holiday_season = os.environ.get('NEW_CATEGORY') == 'True'
 
-    mydb2 = mysql.connector.connect(
-        host=os.environ.get('DBHOST'),
-        user=os.environ.get('DBUSER'),
-        password=os.environ.get('DBSECRET'),
-        database=os.environ.get('DBNAME')
-    )
-    cur2 = mydb2.cursor()
-    productlist = []
-    query = "SELECT * from fourthcoffeedb.products"
-    cur2.execute(query)
-    for item in cur2.fetchall():
-        productlist.append({
-            'id': item[0],
-            'name': item[1],
-            'price': item[2],
-            'currentInventory': item[3],
-            'photolocation': item[4]
-        })
-    cur2.close()
+    season = "Summer"
+    if os.environ.get("SEASON"):
+        season = os.environ.get("SEASON")
+
+    if dbenabled:
+        mydb2 = mysql.connector.connect(
+            host=os.environ.get('DBHOST'),
+            user=os.environ.get('DBUSER'),
+            password=os.environ.get('DBSECRET'),
+            database=os.environ.get('DBNAME')
+        )
+        cur2 = mydb2.cursor()
+        productlist = []
+        query = "SELECT * from fourthcoffeedb.products"
+        cur2.execute(query)
+        for item in cur2.fetchall():
+            productlist.append({
+                'id': item[0],
+                'name': item[1],
+                'price': item[2],
+                'currentInventory': item[3],
+                'photolocation': item[4]
+            })
+        cur2.close()
     
-    return render_template('index3.html', productlist=productlist, dbserver=dbserver, servername=servername)
-    #return render_template('index3.html' if holiday_season else 'index3.html', head_title = head_title, cameras_enabled = cameras_enabled)
+    if season == "Winter":
+        return render_template('winterdb.html' if dbenabled else 'index2.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
+    elif season == "Summer":
+        return render_template('summerdb.html' if dbenabled else 'index.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
+    else:
+        return render_template('indexdb.html' if dbenabled else 'index.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
+    
+    #return render_template('index3.html', productlist=productlist, dbserver=dbserver, servername=servername)
+    #return render_template('index3.html' if dbenabled else 'index.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
+    #return render_template('index.html' if holiday_season else 'index2.html', head_title = head_title, cameras_enabled = cameras_enabled)
 
 @app.route('/inventory')
 def inventory():
