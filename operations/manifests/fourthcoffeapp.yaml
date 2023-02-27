@@ -19,30 +19,15 @@ spec:
         - containerPort: 5000
         env:
         - name: DBHOST
-          valueFrom:
-            configMapKeyRef:
-              name: fc-configmap
-              key: db_host
+          value: my-db
         - name: DBNAME
-          valueFrom: 
-            configMapKeyRef:
-              name: fc-configmap
-              key: db_name
+          value: fourthcoffeedb
         - name: HEAD_TITLE
-          valueFrom: 
-            configMapKeyRef:
-              name: fc-configmap
-              key: head_title
+          value: "Fourth Coffee"
         - name: DBENABLED
-          valueFrom: 
-            configMapKeyRef:
-              name: fc-configmap
-              key: db_enabled
+          value: True
         - name: SEASON
-          valueFrom: 
-            configMapKeyRef:
-              name: fc-configmap
-              key: season
+          value: default
         - name: DBUSER
           value: root
         - name: DBSECRET
