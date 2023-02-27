@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: fourthcoffee-app
+  namespace: fourthcoffee
 spec:
   replicas: 1
   selector:
@@ -52,6 +53,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: fourthcoffee-app
+  namespace: fourthcoffee
   labels:
     app: fourthcoffee-app
 spec:
@@ -67,6 +69,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: my-db
+  namespace: fourthcoffee
 spec:
   replicas: 1
   selector:
@@ -94,6 +97,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: my-db
+  namespace: fourthcoffee
 spec:
   selector:
     app: my-db
