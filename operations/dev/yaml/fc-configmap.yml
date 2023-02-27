@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fc-configmap
+data:
+  db_host: my-db
+  db_name: fourthcoffeedb
+  CAMERAS_ENABLED: False
+  head_title: "Fourth Coffee"
+  db_enabled: False
+  season: ""
+

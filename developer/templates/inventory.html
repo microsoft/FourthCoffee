@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Inventory Tracker v2</title>
-    <link rel="icon" type="image/x-icon" href="static/img/favicon.ico" />
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='inventorystyles.css') }}">
+    <title>Inventory List</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -57,28 +55,101 @@
             });
         });
     </script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+      }
+
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      td {
+        font-size: 14px;
+      }
+
+      .btn-save,
+      .btn-delete {
+        padding: 5px 10px;
+        background-color: #4CAF50;
+        border: none;
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .btn-delete {
+        background-color: #f44336;
+      }
+
+      .btn-save:hover,
+      .btn-delete:hover {
+        background-color: #3e8e41;
+      }
+
+      .btn-save:active,
+      .btn-delete:active {
+        background-color: #3e8e41;
+        transform: translateY(1px);
+      }
+    </style>
   </head>
   <body>
-    <h1>Inventory</h1>
-    <table>
-        <tr>
+
+    <div class="container">
+        <div class="header">
+            <img src="{{ url_for('static',filename='img/fourthcoffee1.png') }}" style="max-width: 1030px;">
+        </div>
+      <table>
+        <thead>
+          <tr>
             <th>ID</th>
             <th>Name</th>
             <th>Price</th>
             <th>Actions</th>
-        </tr>
-        {% for item in inventorylist %}
-        <tr>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in inventorylist %}
+          <tr>
             <td>{{ item.id }}</td>
             <td contenteditable="true">{{ item.name }}</td>
             <td contenteditable="true">{{ item.price }}</td>
             <td>
-                <button class="btn-save" data-id="{{ item.id }}">Save</button>
-                <button class="btn-delete" data-id="{{ item.id }}">Delete</button>
+              <button class="btn-save" data-id="{{ item.id }}">Save</button>
+              <button class="btn-delete" data-id="{{ item.id }}">Delete</button>
             </td>
-        </tr>
-        {% endfor %}
-    </table>
-    
-</body>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <a href="{{ url_for('index') }}">Home</a>
+    </div>
+  </body>
 </html>
