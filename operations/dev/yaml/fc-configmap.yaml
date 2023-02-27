@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: fc-configmap
+  namespace: fourthcoffee
 data:
   db_host: my-db
   db_name: fourthcoffeedb
