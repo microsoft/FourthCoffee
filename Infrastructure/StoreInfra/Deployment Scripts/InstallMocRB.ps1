@@ -152,14 +152,6 @@ AzLogin
 InstallArcRB
 
 
-$AzureSubID="03d13178-3e31-454d-9bdd-9e93bc53828a"
-$AzureTenantID="c76bd4d1-bea3-45ea-be1b-4a745a675d07"
-$AzureSPNAPPId="64e73885-df03-4686-9a5e-42a2326f23f3"
-Install-module az.keyvault -Force
-Connect-AzAccount -Subscription $AzureSubID -Tenant $AzureTenantID
-$Arcsecretact=Get-AzKeyVaultSecret -VaultName CPE-CS-KV -Name "CPPE-ARC-SPN-Account"
-$ARCSecret=$arcsecretact.SecretValue
-$azureAppCred = New-Object System.Management.Automation.PSCredential $AzureSPNAPPId, $ARCSecret
-$azcred=Connect-AzAccount -ServicePrincipal -TenantId $AzureTenantID -Credential $azureAppCred
+
 
 
