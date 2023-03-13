@@ -1,0 +1,65 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "nvr_name": {
+            "value": "bell-doorlock"
+        },
+        "location": {
+            "value": "eastus"
+        },
+        "customLocationId": {
+            "value": "/subscriptions/03d13178-3e31-454d-9bdd-9e93bc53828a/resourceGroups/fc-belltown-rb/providers/Microsoft.ExtendedLocation/customLocations/Cafe-Belltown-CL"
+        },
+        "hardwareProfile": {
+            "value": {
+                "processors": 4,
+                "memoryGB": 8
+            }
+        },
+        "subscriptionId": {
+            "value": "03d13178-3e31-454d-9bdd-9e93bc53828a"
+        },
+        "resourceGroupName": {
+            "value": "fc-belltown-fourthdoor"
+        },
+        "osType": {
+            "value": "Windows"
+        },
+        "adminUsername": {
+            "value": "AzureAdmin"
+        },
+        "resourceTags": {
+            "value": {
+                "Function": "SecApp",
+                "Store": "1010"
+            }
+        },
+        "adminPassword": {
+            "value": null
+        },
+        "marketplaceimage_ref":{
+            "value": "/subscriptions/0c6c3a0d-0866-4e68-939d-ef81ca6f802e/resourceGroups/S1010CL-rg/providers/microsoft.azurestackhci/marketplacegalleryimages/Server2022AE"
+        },
+        "NVR_nic_name":{
+            "value": "nvr-nic0"
+        },
+        "Custom_vnet_name":{
+            "value": "/subscriptions/0c6c3a0d-0866-4e68-939d-ef81ca6f802e/resourceGroups/s1010-aks/providers/Microsoft.AzureStackHCI/virtualnetworks/default-vnet"
+        },
+        "secapp_name": {
+            "value": "cb-SecApp"
+        },
+        "secapp_resourceTags": {
+            "value": {
+                "Function": "SecApp",
+                "Store": "1010"
+            }
+        },
+        "secapp-nic-name":{
+            "value": "secapp-nic0"
+        }
+       
+    }
+
+}

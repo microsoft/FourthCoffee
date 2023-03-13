@@ -1,0 +1,248 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "nvr_name": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "customLocationId": {
+            "type": "string"
+        },
+        "hardwareProfile": {
+            "type": "object"
+        },
+        "subscriptionId": {
+            "type": "string"
+        },
+        "resourceGroupName": {
+            "type": "string"
+        },
+        "osType": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "resourceTags": {
+            "type": "object"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "marketplaceimage_ref":{
+            "type": "string"
+        },
+        "NVR_nic_name":{
+            "type": "string"
+        },
+        "Custom_vnet_name":{
+            "type": "string"
+        },
+        "secapp_name":{
+            "type": "string"
+        },
+        "secapp_resourceTags":{
+            "type": "object"
+        },
+        "secapp-nic-name":{
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2021-09-01-preview",
+            "name": "[parameters('nvr_name')]",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.AzureStackHCI/virtualmachines",
+            "tags": "[parameters('resourceTags')]",
+            "properties": {
+                "resourceName": "[parameters('nvr_name')]",
+                "hardwareProfile": "[parameters('hardwareProfile')]",
+                "osProfile": {
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "osType": "[parameters('osType')]",
+                    "computerName": "[parameters('nvr_name')]",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "name": "[parameters('marketplaceimage_ref')]"
+                    },
+                    "dataDisks": [
+                        {
+                            "name": "[resourceid('Microsoft.AzureStackHCI/virtualharddisks','data1')]"
+                        },
+                        {
+                            "name": "[resourceid('Microsoft.AzureStackHCI/virtualharddisks','Data2')]"
+                        },
+                        {
+                            "name": "[resourceid('Microsoft.AzureStackHCI/virtualharddisks','Data3')]"
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceid('Microsoft.AzureStackHCI/networkinterfaces',parameters('NVR_nic_name'))]"
+                        }
+                    ]
+                }
+            },
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "dependsOn": [
+                "Microsoft.AzureStackHCI/virtualharddisks/data1",
+                "Microsoft.AzureStackHCI/virtualharddisks/Data2",
+                "Microsoft.AzureStackHCI/virtualharddisks/Data3",
+                "[resourceid('Microsoft.AzureStackHCI/networkinterfaces',parameters('NVR_nic_name'))]"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            }
+        },
+        {
+            "name": "data1",
+            "apiVersion": "2021-09-01-preview",
+            "type": "Microsoft.AzureStackHCI/virtualharddisks",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "properties": {
+                "diskSizeBytes": 500,
+                "dynamic": true,
+                "resourceName": "data1"
+            }
+        },
+        {
+            "name": "Data2",
+            "apiVersion": "2021-09-01-preview",
+            "type": "Microsoft.AzureStackHCI/virtualharddisks",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "properties": {
+                "diskSizeBytes": 500,
+                "dynamic": true,
+                "resourceName": "Data2"
+            }
+        },
+        {
+            "name": "Data3",
+            "apiVersion": "2021-09-01-preview",
+            "type": "Microsoft.AzureStackHCI/virtualharddisks",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "properties": {
+                "diskSizeBytes": 500,
+                "dynamic": true,
+                "resourceName": "Data3"
+            }
+        },
+        {
+            "apiVersion": "2021-09-01-preview",
+            "name": "[parameters('NVR_nic_name')]",
+            "type": "Microsoft.AzureStackHCI/networkinterfaces",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "properties": {
+                "resourceName": "[parameters('NVR_nic_name')]",
+                "ipConfigurations": [
+                    {
+                        "name": "[parameters('NVR_nic_name')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('Custom_vnet_name')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2021-09-01-preview",
+            "name": "[parameters('SecApp_Name')]",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.AzureStackHCI/virtualmachines",
+            "tags": "[parameters('secapp_resourceTags')]",
+            "properties": {
+                "resourceName": "[parameters('secapp_name')]",
+                "hardwareProfile": "[parameters('hardwareProfile')]",
+                "osProfile": {
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "osType": "[parameters('osType')]",
+                    "computerName": "[parameters('secapp_name')]",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "name": "[parameters('marketplaceimage_ref')]"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceid('Microsoft.AzureStackHCI/networkinterfaces',parameters('secapp-nic-name'))]"
+                        }
+                    ]
+                }
+            },
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "dependsOn": [
+                "[resourceid('Microsoft.AzureStackHCI/networkinterfaces',parameters('secapp-nic-name'))]"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            }
+        },
+        {
+            "apiVersion": "2021-09-01-preview",
+            "name": "[parameters('secapp-nic-name')]",
+            "type": "Microsoft.AzureStackHCI/networkinterfaces",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "properties": {
+                "resourceName": "[parameters('secapp-nic-name')]",
+                "ipConfigurations": [
+                    {
+                        "name":"[parameters('secapp-nic-name')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('Custom_vnet_name')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        } 
+    ]
+}

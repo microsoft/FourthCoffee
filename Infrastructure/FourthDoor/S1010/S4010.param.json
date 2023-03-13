@@ -1,0 +1,65 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "nvr_name": {
+            "value": "udis-doorlock"
+        },
+        "location": {
+            "value": "eastus"
+        },
+        "customLocationId": {
+            "value": "/subscriptions/03d13178-3e31-454d-9bdd-9e93bc53828a/resourceGroups/fc-utown-rb/providers/Microsoft.ExtendedLocation/customLocations/Cafe-UDistrict-CL"
+        },
+        "hardwareProfile": {
+            "value": {
+                "processors": 4,
+                "memoryGB": 8
+            }
+        },
+        "subscriptionId": {
+            "value": "03d13178-3e31-454d-9bdd-9e93bc53828a"
+        },
+        "resourceGroupName": {
+            "value": "fc-utown-fourthdoor"
+        },
+        "osType": {
+            "value": "Windows"
+        },
+        "adminUsername": {
+            "value": "AzureAdmin"
+        },
+        "resourceTags": {
+            "value": {
+                "Function": "SecApp",
+                "Store": "hq"
+            }
+        },
+        "adminPassword": {
+            "value": null
+        },
+        "marketplaceimage_ref":{
+            "value": "/subscriptions/03d13178-3e31-454d-9bdd-9e93bc53828a/resourceGroups/fc-utown-rb/providers/Microsoft.AzureStackHCI/marketplacegalleryimages/Server22AECore"
+        },
+        "NVR_nic_name":{
+            "value": "doorlock-nic0"
+        },
+        "Custom_vnet_name":{
+            "value": "/subscriptions/03d13178-3e31-454d-9bdd-9e93bc53828a/resourceGroups/fc-utown-rb/providers/Microsoft.AzureStackHCI/virtualnetworks/cafe-udistrict-mgmt"
+        },
+        "secapp_name": {
+            "value": "udis-SecApp"
+        },
+        "secapp_resourceTags": {
+            "value": {
+                "Function": "SecApp",
+                "Store": "4010"
+            }
+        },
+        "secapp-nic-name":{
+            "value": "secapp-nic0"
+        }
+       
+    }
+
+}
