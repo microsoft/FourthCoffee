@@ -18,5 +18,11 @@ VALUES ('Regular Coffee', 2.5, 10000, "static/img/product1.jpg"),
        ('Green Tea', 2.0, 10000, "static/img/product7.jpg"),
        ('Double Espresso', 3.5, 10000, "static/img/product8.jpg"),
        ('Go Fourth Sample', 7, 10000, "static/img/product9.jpg");
-       
+
+CREATE TABLE Orders (
+    orderID INT PRIMARY KEY AUTO_INCREMENT,
+    orderDate DATETIME,
+    orderdetails JSON,
+    storeId INT
+);
     

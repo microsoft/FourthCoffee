@@ -1,0 +1,142 @@
+<html>
+  <head>
+    <title>{{ head_title }}</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" type="image/x-icon" href="static/img/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/jquery-ui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+    <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/jquery-ui.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/index.js') }}"></script>
+  </head>
+  <body>
+
+   <!-- ============================== ALERT SECTION START ============================== -->
+   <!-- <div class="alert alert-success" style="z-index:1" id="success-alert">
+      <button type="button" class="close" data-dismiss="alert">x</button>
+      <strong>Success! </strong> Product purchased.
+   </div>
+   <div class="alert alert-danger" style="z-index:1" id="error-alert">
+      <button type="button" class="close" data-dismiss="alert">x</button>
+      <strong>Error! </strong> Failed to commit purchase transaction.
+   </div> -->
+
+    <!-- ============================== MAIN SECTION START ============================== -->
+   <section id="mainSection">
+    <div class="row mx-0">
+      <!-- ============================== CAMERAS SECTION START ============================== -->
+      {% if cameras_enabled %}
+      <div id="cameraArea" class="col-md-3 px-1">
+         <div class="row">
+           <img class="imgVideo" src="{{ url_for('video_feed', feed='1.mkv') }}">
+         </div>
+         <div class="row">
+           <img class="imgVideo" src="{{ url_for('video_feed', feed='2.mkv') }}">
+         </div>
+         <div class="row">
+           <img class="imgVideo" src="{{ url_for('video_feed', feed='3.mkv') }}">
+         </div>
+         <div class="row">
+           <img class="imgVideo" src="{{ url_for('video_feed', feed='4.mkv') }}">
+         </div>
+      </div>
+      {% endif %}
+
+       <!-- ============================== PRODUCT AREA START ============================== -->
+       <div id="productArea" class="col-md-9 px-1">
+         <div class="row" style="background-color: #B17946 ; margin-left: 2px; margin-right: 2px; margin-bottom: 5px;">
+            <div clas="col-md-12">
+               <img src="{{ url_for('static',filename='img/fourthcoffee1.png') }}" style="max-width:1030px"/>
+            </div>
+         </div>
+        <div class="bottom-area-btns">
+          <button class="btn btn-1" type="button"><i class="fa fa-coffee"></i> Order</button>
+          <button class="btn btn-2" type="button" data-toggle="modal" data-target="#"><i class="fa fa-keyboard-o"></i> Keyboard</button>
+          <button class="btn btn-3" type="button" data-toggle="modal" data-target="#holdSaleModal"><i class="fa fa-folder-open"></i> Hold Sales</button>
+          <button class="btn btn-4" type="button" data-toggle="modal" data-target="#"><i class="fa fa-times-circle"></i> Cancel</button>
+          <button class="btn btn-5" type="button" data-toggle="modal" data-target="#holdBox"><i class="fa fa-credit-card"></i> Payment</button>
+          <button class="btn btn-6" type="button" data-toggle="modal" data-target="#paymentModal"><i class="fa fa-dollar"></i> Discounts</button>
+          <button class="btn btn-7" type="button" data-toggle="modal" data-target="#holdBox"><i class="fa fa-gift"></i> Gift Cards</button>
+       </div>
+          <div class="top-area-btns d-none d-xl-block">
+             <div class="right-part">
+                <button class="btn btn-green" type="button" data-toggle="modal" data-target="#allSaleModal"><i class="fa fa-shopping-bag"></i> <span> Current order</span></button>
+                <button class="btn btn-green" type="button"><i class="fa fa-history"></i> <span> Sales history</span></button>
+                <button class="btn btn-green" type="button"><i class="fa fa-sign-out"></i> <span> Logout</span></button>
+             </div>
+          </div>
+          <div class="product-area">
+             <div class="accesories">
+                <div class="side-indicator">
+                   <button class="btn active-btn mt-0" type="button">All</button>
+                   <button class="btn" type="button">Hot Coffees</button>
+                   <button class="btn" type="button">Hot Teas</button>
+                   <button class="btn" type="button">Hot Drinks</button>
+                   <button class="btn" type="button">Blended</button>
+                   <button class="btn" type="button">Cold Coffees</button>
+                   <button class="btn" type="button">Iced Teas</button>
+                   <button class="btn" type="button">Bakery</button>
+                   <button class="btn" type="button">Breakfast</button>
+                   <button class="btn" type="button">Yogurt</button>
+                   <button class="btn" type="button">Sweets</button>
+                   <button class="btn" type="button">Whole Bean</button>
+                   <button class="btn" type="button">Foo</button>
+                   <button class="btn" type="button">Bar</button>
+                   <button class="btn" type="button">Baz</button>
+                   <button class="btn" type="button">What!</button>
+                   <button class="btn" type="button">Others</button>
+                </div>
+                <div class="item-area">
+                   <div class="item-top-area top-area">
+                      <div class="input-group">
+                         <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                         </div>
+                         <input id="monId" class="form-control" type="text" placeholder="Name or code or category" virtual-keyboard>
+                      </div>
+                      <div class="input-group">
+                         <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-barcode"></i></span>
+                         </div>
+                         <input class="form-control" type="text" placeholder="Barcode">
+                      </div>
+                      <div class="edit-icon">
+                         <button class="btn fa-btn" type="button" data-toggle="modal" data-target="#addItemBox"><i class="fa fa-plus"></i></button>
+                      </div>
+                   </div>
+                   <div class="mob-btns">
+                      <button class="btn btn-green" type="button">Category</button>
+                      <button class="btn btn-green active-btn ml-auto float-right" type="button">Product</button>
+                   </div>
+                   <div class="item-area-box row mx-0">
+                    {% for product in productlist %}
+                      <div class="col-6 col-md-4 px-1">
+                         <div class="item-box mt-0 text-center" data-toggle="modal" data-target="#productBox">
+                            <div class="txt-box">
+                               <span>Price {{ product.price }}</span>
+                            </div>
+                            <div class="img-box">
+                               <img onclick="addPurchase(1)" src="{{ product.photolocation }}" class="img-fluid" alt="">
+                            </div>
+                            <div class="txt-box item-name">
+                               <span><b>{{ product.name }}</b></span>
+                            </div>
+                         </div>
+                      </div>
+                      {% endfor %}
+                      <div><br/>DB Server: {{ dbserver }}<br/>Server Name: {{ servername }}</div>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+    
+ </section>
+  </body>
+</html>

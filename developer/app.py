@@ -2,27 +2,46 @@
 from importlib import import_module
 import os
 import cv2
-from flask import Flask, render_template, Response, request, url_for, redirect
+from flask import Flask, render_template, Response, request, url_for, redirect, session
+from flask_session import Session
 from sqlConnector import SqlConnector
 import mysql.connector
 import socket
+import secrets
+import mysql.connector
+from mysql.connector import pooling
+from datetime import datetime
+import json
 
 app = Flask(__name__)
+app.secret_key = secrets.token_hex(16)
+app.config["SESSION PERMANENT"] = False
+app.config['SESSION_TYPE'] = "filesystem"
+Session(app)
 
-dbenabled = os.environ.get("DBENABLED")
 
+dbconfig = {
+    "pool_name": "mypool",
+    "pool_size": 20,
+    "host": os.environ.get('DBHOST'),
+    "user": os.environ.get('DBUSER'),
+    "password": os.environ.get('DBSECRET'),
+    "database": os.environ.get('DBNAME')
+}
 
-if dbenabled:
-    mydb = mysql.connector.connect(
-        host=os.environ.get('DBHOST'),
-        user=os.environ.get('DBUSER'),
-        password=os.environ.get('DBSECRET'),
-        database=os.environ.get('DBNAME')
-   )
+cnxpool = pooling.MySQLConnectionPool(**dbconfig)
 
 
 dbserver = os.environ.get('DBHOST')
+storeid = os.environ.get('STOREID')
 servername = socket.gethostname()
+dbenabled = 1
+
+
+@app.route('/reset')
+def reset():
+    session.clear()
+    return 'Session reset'
 
 @app.route('/')
 def index():
@@ -45,27 +64,21 @@ def index():
     if os.environ.get("SEASON"):
         season = os.environ.get("SEASON")
 
-    if dbenabled:
-        mydb2 = mysql.connector.connect(
-            host=os.environ.get('DBHOST'),
-            user=os.environ.get('DBUSER'),
-            password=os.environ.get('DBSECRET'),
-            database=os.environ.get('DBNAME')
-        )
-        cur2 = mydb2.cursor()
-        productlist = []
-        query = "SELECT * from fourthcoffeedb.products"
-        cur2.execute(query)
-        for item in cur2.fetchall():
-            productlist.append({
-                'id': item[0],
-                'name': item[1],
-                'price': item[2],
-                'currentInventory': item[3],
-                'photolocation': item[4]
-            })
-        cur2.close()
-    
+    cnx = cnxpool.get_connection()
+    cur = cnx.cursor()
+    productlist = []
+    query = "SELECT * from fourthcoffeedb.products"
+    cur.execute(query)
+    for item in cur.fetchall():
+        productlist.append({
+            'produtctid': item[0],
+            'name': item[1],
+            'price': item[2],
+            'currentInventory': item[3],
+            'photolocation': item[4]
+        })
+    cur.close()
+
     if season == "Winter":
         return render_template('winterdb.html' if dbenabled else 'index2.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
     elif season == "Summer":
@@ -79,25 +92,21 @@ def index():
 
 @app.route('/inventory')
 def inventory():
-    mydb2 = mysql.connector.connect(
-    host=os.environ.get('DBHOST'),
-    user=os.environ.get('DBUSER'),
-    password=os.environ.get('DBSECRET'),
-    database=os.environ.get('DBNAME')
-    )
     try:
-        cur2 = mydb2.cursor()
+        cnx = cnxpool.get_connection()
+        cur = cnx.cursor()
         inventorylist = []
         query = "SELECT * from fourthcoffeedb.products"
-        cur2.execute(query)
-        for item in cur2.fetchall():
+        cur.execute(query)
+        for item in cur.fetchall():
             inventorylist.append({
                 'id': item[0],
                 'name': item[1],
                 'price': item[2],
                 'currentInventory': item[3]
             })
-        cur2.close()
+        cur.close()
+        cnx.close()
         return render_template('inventory.html', inventorylist=inventorylist)
     except Exception as e:
         return "Error querying items: " + str(e)
@@ -130,20 +139,80 @@ def add_item():
         capacity = int(request.form['capacity'])
 
         # Insert item into database
+        cnx = cnxpool.get_connection()
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO inventory (name, quantity, capacity) VALUES (%s, %s, %s)", (name, quantity, capacity))
         mysql.connection.commit()
         cur.close()
+        cnx.close()
 
         # Return success message
         return "Item added successfully."
     except Exception as e:
         # Handle errors
         return "Error adding item: " + str(e)
+    
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    # Get the product ID and quantity from the form data
+    product_id = request.form['product_id']
+    product_name = request.form['product_name']
+    product_price = request.form['product_price']
+    quantity = 1
+
+    # Create a new cart item with the product data and quantity
+    item = {
+        'id': product_id,
+        'quantity': quantity,
+        'name': product_name,
+        'price': product_price
+    }
+
+    # Add the item to the shopping cart session
+    if 'cart' not in session:
+        session['cart'] = []
+    session['cart'].append(item)
+
+    # Redirect back to the homepage
+    return redirect('/')
+
+@app.route('/cart')
+def cart():
+    # Get the cart data from the session
+    summary = {}
+    cart = session.get('cart', [])
+    for item in cart:
+        id = item['id']
+        quantity = item['quantity']
+        if id in summary:
+            summary[id] += quantity
+        else:
+            summary[id] = quantity
+    # print (summary)
+    # Render the shopping cart template with the cart data
+    return render_template('cart.html', cart=cart)
+
+@app.route('/checkout')
+def checkout():
+    cnx = cnxpool.get_connection()
+    cur = cnx.cursor()
+    cart = session.get('cart', [])
+    orderDate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    jsoncart = json.dumps(cart)
+    query = "INSERT INTO Orders (orderDate, orderdetails, storeId) VALUE ('{}', '{}', {})".format(orderDate, jsoncart, storeid)
+    cur.execute(query)
+    ordernumber = cur.lastrowid
+    cnx.commit()
+    cur.close()
+    cnx.close()
+    session.clear()
+    return render_template('checkout.html', ordernumber=ordernumber)
+
 
 @app.route('/update_item', methods=['POST'])
 def update_item():
-    cur = mydb.cursor()
+    cnx = cnxpool.get_connection()
+    cur = cnx.cursor()
     try:
         # Get item information from request data
         item_id = int(request.form['id'])
@@ -152,7 +221,7 @@ def update_item():
 
         # Update item in database  
         cur.execute("UPDATE products SET Name=%s, price=%s WHERE id=%s", (name, price, item_id))
-        mydb.commit()
+        cnx.commit()
         cur.close()
 
         # Return success message
@@ -168,9 +237,10 @@ def delete_item():
         item_id = int(request.form['id'])
 
         # Delete item from database
-        cur = mydb.cursor()
+        cnx = cnxpool.get_connection()
+        cur = cnx.cursor()
         cur.execute("DELETE FROM products WHERE id=%s", (item_id,))
-        mydb.commit()
+        cnx.commit()
         cur.close()
 
         # Return success message
