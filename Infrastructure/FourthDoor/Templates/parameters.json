@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "secapp_name": {
+            "value": "cafe-belltown-secapp"
+        },
+        "nvr_name": {
+            "value": "cafe-belltown-nvr"
+        },
+        "location": {
+            "value": "eastus"
+        },
+        "customLocationId": {
+            "value": "/subscriptions/0c6c3a0d-0866-4e68-939d-ef81ca6f802e/resourceGroups/s1010-aks/providers/Microsoft.ExtendedLocation/customLocations/s1010CL"
+        },
+        "hardwareProfile": {
+            "value": {
+                "processors": 4,
+                "memoryGB": 8
+            }
+        },
+        "subscriptionId": {
+            "value": "3127e2af-c391-46d9-9699-4bdb12c29012"
+        },
+        "resourceGroupName": {
+            "value": "s1010-iaas"
+        },
+        "osType": {
+            "value": "Windows"
+        },
+        "adminUsername": {
+            "value": "AzureAdmin"
+        },
+        "adminPassword": {
+            "value": null
+        },
+        "fileUris": {
+            "value": "https://fccwblob.blob.core.windows.net/share/cse.ps1?sp=r&st=2022-11-04T13:51:11Z&se=2022-11-30T22:51:11Z&spr=https&sv=2021-06-08&sr=b&sig=0IMn6FZkNy2QHs4AtNDSlV%2Bwin22Fb1x9M7XyWadKKM%3D"
+        },
+        "date": {
+            "value": "20221102T164439Z"
+        },
+        "arguments": {
+            "value": null
+        },
+        "resourceProviderAndType": {
+            "value": "Microsoft.AzureStackHCI/virtualmachines"
+        },
+        "apiVersion": {
+            "value": "2021-09-01-preview"
+        },
+        "virtualnetwork_customlocation":{
+            "value": "/subscriptions/0c6c3a0d-0866-4e68-939d-ef81ca6f802e/resourceGroups/s1010-aks/providers/Microsoft.AzureStackHCI/virtualnetworks/default-vnet"
+        },
+
+        "secapp_virtualnetworkresource":{
+            "value": "Microsoft.AzureStackHCI/networkinterfaces/Cafe-Belltown-SecApp-nic0"
+        },
+        "secapp_virtualnic_name":{
+            "value": "Cafe-Belltown-SecApp-nic0"
+        },
+
+        "nvr_virtualnetworkresource":{
+            "value": "Microsoft.AzureStackHCI/networkinterfaces/Cafe-Belltown-SecApp-nic0"
+        },
+        "nvr_virtualnic_name":{
+            "value": "Cafe-Belltown-NVRApp-nic0"
+        },
+
+        "secapp_customimage":{
+            "value": "/subscriptions/0c6c3a0d-0866-4e68-939d-ef81ca6f802e/resourceGroups/S1010CL-rg/providers/microsoft.azurestackhci/marketplacegalleryimages/Server2022AE"
+        },
+
+        "nvr_customimage":{
+            "value": "/subscriptions/0c6c3a0d-0866-4e68-939d-ef81ca6f802e/resourceGroups/S1010CL-rg/providers/microsoft.azurestackhci/marketplacegalleryimages/Server2022AE"
+        }
+
+
+    }
+}

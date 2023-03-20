@@ -1,0 +1,390 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "secapp_name": {
+            "type": "String"
+        },
+         "nvr_name": {
+            "type": "String"
+        },
+        "location": {
+            "type": "String"
+        },
+        "customLocationId": {
+            "type": "String"
+        },
+        "hardwareProfile": {
+            "type": "Object"
+        },
+        "subscriptionId": {
+            "type": "String"
+        },
+        "resourceGroupName": {
+            "type": "String"
+        },
+        "osType": {
+            "type": "String"
+        },
+        "adminUsername": {
+            "type": "String"
+        },
+        "adminPassword": {
+            "type": "SecureString"
+        },
+        "fileUris": {
+            "type": "String"
+        },
+        "date": {
+            "defaultValue": "[utcNow()]",
+            "type": "String"
+        },
+        "arguments": {
+            "defaultValue": " ",
+            "type": "SecureString"
+        },
+        "resourceProviderAndType": {
+            "type": "String"
+        },
+        "apiVersion": {
+            "type": "String"
+        },
+        "virtualnetwork_customlocation":{
+            "type": "string"
+        },
+
+        "secapp_virtualnetworkresource":{
+            "type": "string"
+        },
+        "secapp_virtualnic_name":{
+            "type": "string"
+        },
+
+        "nvr_virtualnetworkresource":{
+            "type": "string"
+        },
+        "nvr_virtualnic_name":{
+            "type": "string"
+        },
+        "secapp_customimage":{
+            "type": "string"
+        },
+         "nvr_customimage":{
+            "type": "string"
+        },
+        "NVR_nic_name": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "UriFileNamePieces": "[split(parameters('fileUris'), '/')]",
+        "firstFileNameString": "[variables('UriFileNamePieces')[sub(length(variables('UriFileNamePieces')), 1)]]",
+        "firstFileNameBreakString": "[split(variables('firstFileNameString'), '?')]",
+        "firstFileName": "[variables('firstFileNameBreakString')[0]]",
+        "deploymentName": "[concat(if(greater(length(parameters('secapp_name')), 29), substring(parameters('secapp_name'), 0, 29), parameters('secapp_name')),'-CustomScriptExt-', parameters('date'))]"
+    },
+    "resources": [
+        //Application Server
+        {
+            "type": "Microsoft.AzureStackHCI/virtualmachines",
+            "apiVersion": "2021-09-01-preview",
+            "name": "[parameters('secapp_name')]",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "dependsOn": [
+                "[parameters('secapp_virtualnetworkresource')]"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "resourceName": "[parameters('secapp_name')]",
+                "hardwareProfile": "[parameters('hardwareProfile')]",
+                "osProfile": {
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "osType": "[parameters('osType')]",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "name": "[parameters('secapp_customimage')]"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceid('Microsoft.AzureStackHCI/networkinterfaces',parameters('secapp_virtualnic_name'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        // NVR VM
+{
+            "type": "Microsoft.AzureStackHCI/virtualmachines",
+            "apiVersion": "2021-09-01-preview",
+            "name": "[parameters('nvr_name')]",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "dependsOn": [
+                "[parameters('nvr_virtualnetworkresource')]"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "resourceName": "[parameters('nvr_name')]",
+                "hardwareProfile": "[parameters('hardwareProfile')]",
+                "osProfile": {
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "osType": "[parameters('osType')]",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "name": "[parameters('nvr_customimage')]"
+                    },
+                    "dataDisks": [
+                        {
+                            "name": "[resourceid('Microsoft.AzureStackHCI/virtualharddisks','Data1')]"
+                        },
+                        {
+                            "name": "[resourceid('Microsoft.AzureStackHCI/virtualharddisks','Data2')]"
+                        },
+                        {
+                            "name": "[resourceid('Microsoft.AzureStackHCI/virtualharddisks','Data3')]"
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceid('Microsoft.AzureStackHCI/networkinterfaces',parameters('nvr_virtualnic_name'))]"
+                        }
+                    ]
+                },
+                 "dependsOn": [
+                "Microsoft.AzureStackHCI/virtualharddisks/Data1",
+                "Microsoft.AzureStackHCI/virtualharddisks/Data2",
+                "Microsoft.AzureStackHCI/virtualharddisks/Data3",
+                "Microsoft.AzureStackHCI/networkinterfaces/nic0"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            }
+            }
+        },
+        {
+            "name": "Data1",
+            "apiVersion": "2021-09-01-preview",
+            "type": "Microsoft.AzureStackHCI/virtualharddisks",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "properties": {
+                "diskSizeBytes": 500,
+                "dynamic": true,
+                "resourceName": "Date1"
+            }
+        },
+        {
+            "name": "Data2",
+            "apiVersion": "2021-09-01-preview",
+            "type": "Microsoft.AzureStackHCI/virtualharddisks",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "properties": {
+                "diskSizeBytes": 500,
+                "dynamic": true,
+                "resourceName": "Data2"
+            }
+        },
+        {
+            "name": "Data3",
+            "apiVersion": "2021-09-01-preview",
+            "type": "Microsoft.AzureStackHCI/virtualharddisks",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "properties": {
+                "diskSizeBytes": 500,
+                "dynamic": true,
+                "resourceName": "Data3"
+            }
+        },
+        //APP VM Nic Interface
+        {
+            "type": "Microsoft.AzureStackHCI/networkinterfaces",
+            "apiVersion": "2021-09-01-preview",
+            "name": "[parameters('secapp_virtualnic_name')]",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "properties": {
+                "resourceName": "[parameters('secapp_virtualnic_name')]",
+                "ipConfigurations": [
+                    {
+                        "name": "[parameters('secapp_virtualnic_name')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('virtualnetwork_customlocation')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+    //NVR Nic Interface
+         {
+            "type": "Microsoft.AzureStackHCI/networkinterfaces",
+            "apiVersion": "2021-09-01-preview",
+            "name": "[parameters('nvr_virtualnic_name')]",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+            },
+            "properties": {
+                "resourceName": "[parameters('nvr_virtualnic_name')]",
+                "ipConfigurations": [
+                    {
+                        "name": "[parameters('nvr_virtualnic_name')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('virtualnetwork_customlocation')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        //Application Server Extensions
+        {
+            "type": "Microsoft.AzureStackHCI/virtualMachines/extensions",
+            "apiVersion": "2021-09-01-preview",
+            "name": "[format('{0}/AzureMonitorAgent', parameters('secapp_name'))]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.AzureStackHCI/virtualmachines', parameters('secapp_name'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Monitor",
+                "type": "AzureMonitorWindowsAgent",
+                "typeHandlerVersion": "1.5",
+                "autoUpgradeMinorVersion": true
+            }
+        },
+        //NVR Server Extensions
+         {
+            "type": "Microsoft.AzureStackHCI/virtualMachines/extensions",
+            "apiVersion": "2021-09-01-preview",
+            "name": "[format('{0}/AzureMonitorAgent', parameters('nvr_name'))]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.AzureStackHCI/virtualmachines', parameters('nvr_name'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Monitor",
+                "type": "AzureMonitorWindowsAgent",
+                "typeHandlerVersion": "1.5",
+                "autoUpgradeMinorVersion": true
+            }
+        }
+        /*
+        //SecApp DEployment
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "name": "[variables('deploymentName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.AzureStackHCI/virtualmachines', parameters('secapp_name'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "name": "[concat(parameters('secapp_name'),'/CustomScriptExtension')]",
+                            "type": "[concat(parameters('resourceProviderAndType'),'/extensions')]",
+                            "location": "[parameters('location')]",
+                            "apiVersion": "[parameters('apiVersion')]",
+                            "properties": {
+                                "publisher": "Microsoft.Compute",
+                                "type": "CustomScriptExtension",
+                                "autoUpgradeMinorVersion": true,
+                                "settings": {
+                                    "fileUris": "[split(parameters('fileUris'), ' ')]"
+                                },
+                                "protectedSettings": {
+                                    "commandToExecute": "[concat ('powershell -ExecutionPolicy Unrestricted -File ', variables('firstFileName'), ' ', parameters('arguments'))]"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        
+        //NVR Deployment
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "name": "[variables('deploymentName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.AzureStackHCI/virtualmachines', parameters('nvr_name'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "name": "[concat(parameters('secapp_name'),'/CustomScriptExtension')]",
+                            "type": "[concat(parameters('resourceProviderAndType'),'/extensions')]",
+                            "location": "[parameters('location')]",
+                            "apiVersion": "[parameters('apiVersion')]",
+                            "properties": {
+                                "publisher": "Microsoft.Compute",
+                                "type": "CustomScriptExtension",
+                                "autoUpgradeMinorVersion": true,
+                                "settings": {
+                                    "fileUris": "[split(parameters('fileUris'), ' ')]"
+                                },
+                                "protectedSettings": {
+                                    "commandToExecute": "[concat ('powershell -ExecutionPolicy Unrestricted -File ', variables('firstFileName'), ' ', parameters('arguments'))]"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        */
+    ]
+}
