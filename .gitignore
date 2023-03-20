@@ -130,4 +130,5 @@ dmypy.json
 
 #Python virtual envs
 virtual/
+flask_session/
 helpers.txt
