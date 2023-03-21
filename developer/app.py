@@ -80,11 +80,11 @@ def index():
     cur.close()
 
     if season == "Winter":
-        return render_template('winterdb.html' if dbenabled else 'index2.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
+        return render_template('winterdb.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
     elif season == "Summer":
-        return render_template('summerdb.html' if dbenabled else 'index.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
+        return render_template('summerdb.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
     else:
-        return render_template('indexdb.html' if dbenabled else 'index.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
+        return render_template('indexdb.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
     
     #return render_template('index3.html', productlist=productlist, dbserver=dbserver, servername=servername)
     #return render_template('index3.html' if dbenabled else 'index.html', productlist=productlist, head_title = head_title, cameras_enabled = cameras_enabled, dbserver=dbserver, servername=servername)
@@ -199,7 +199,7 @@ def checkout():
     cart = session.get('cart', [])
     orderDate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     jsoncart = json.dumps(cart)
-    query = "INSERT INTO Orders (orderDate, orderdetails, storeId) VALUE ('{}', '{}', {})".format(orderDate, jsoncart, storeid)
+    query = "INSERT INTO Orders (orderDate, orderdetails, storeId) VALUES ('{}', '{}', {})".format(orderDate, jsoncart, storeid)
     cur.execute(query)
     ordernumber = cur.lastrowid
     cnx.commit()

@@ -8,6 +8,6 @@ data:
   db_name: fourthcoffeedb
   CAMERAS_ENABLED: "False"
   head_title: "El Jarocho"
-  db_enabled: "False"
+  db_enabled: "1"
   season: "default"
 

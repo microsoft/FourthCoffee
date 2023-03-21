@@ -1,3 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fourthcoffee
+  labels:
+    name: fourthcoffee
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -47,8 +54,11 @@ spec:
         - name: DBUSER
           value: root
         - name: DBSECRET
-          value: Microsoft2022
+          value: secret
+        - name: STOREID
+          value: '3'
 ---
+#Service for Front End
 apiVersion: v1
 kind: Service
 metadata:
@@ -65,6 +75,7 @@ spec:
     port: 5000
     targetPort: 5000
 ---
+#Deployment for MySQL Pod using a custom container
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -82,7 +93,10 @@ spec:
     spec:
       containers:
       - name: db
-        image: bcacr.azurecr.io/fourthcoffeedb/fourthcoffeedb:latest
+        image: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "secret"
         ports:
         - containerPort: 3306
         volumeMounts:
@@ -93,6 +107,7 @@ spec:
           hostPath:
             path: /var/mysql-data
 ---
+#Service for MySQL
 apiVersion: v1
 kind: Service
 metadata:
@@ -105,3 +120,56 @@ spec:
   - name: mysql
     port: 3306
     targetPort: 3306
+---
+#ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fc-configmap
+  namespace: fourthcoffee
+data:
+  db_host: my-db
+  db_name: fourthcoffeedb
+  CAMERAS_ENABLED: "False"
+  head_title: "El Jarocho"
+  db_enabled: "False"
+  season: "default"
+---
+# Job to Initialize the Database / Only runs at the creating of the mysql pod
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db
+  namespace: fourthcoffee
+spec:
+  template:
+    metadata:
+      name: init-db
+    spec:
+      containers:
+      - name: my-db
+        image: bcacr.azurecr.io/fourthcoffeedb/fourthcoffeedb:latest
+        env:
+        - name: MYSQL_HOST
+          value: my-db
+        - name: MYSQL_PWD
+          value: secret    
+        - name: MYSQL_DB
+          value: fourthcoffeedb
+        - name: MYSQL_ROOT_PWD
+          value: secret         
+        command:
+          - sh
+          - -c
+          - |
+            mysql -h $MYSQL_HOST -u root -p${MYSQL_ROOT_PWD} -e "CREATE DATABASE IF NOT EXISTS fourthcoffeedb;"
+            mysql -h $MYSQL_HOST -u root -p${MYSQL_ROOT_PWD} -e "CREATE TABLE fourthcoffeedb.products (id int NOT NULL AUTO_INCREMENT, Name text,Price double, Stock int, photopath text, PRIMARY KEY (id));"
+            mysql -h $MYSQL_HOST -u root -p${MYSQL_ROOT_PWD} -e "CREATE TABLE fourthcoffeedb.Orders (orderID INT PRIMARY KEY AUTO_INCREMENT, orderDate DATETIME, orderdetails JSON, storeId INT );"
+            mysql -h $MYSQL_HOST -u root -p${MYSQL_ROOT_PWD} -e "INSERT INTO fourthcoffeedb.products (Name, Price, Stock, photopath) VALUES ('Regular Coffee', 2.5, 10000, 'static/img/product1.jpg'),('Espresso', 3.25, 10000, 'static/img/product2.jpg'),('Hot Chocolate', 3.75, 10000, 'static/img/product3.jpg'), ('Cafe Mocha', 3.00, 10000, 'static/img/product4.jpg'), ('Black Tea', 1.75, 10000, 'static/img/product5.jpg'), ('Cafe Latte', 4, 10000, 'static/img/product6.jpg'),  ('Green Tea', 2.0, 10000, 'static/img/product7.jpg'), ('Double Espresso', 3.5, 10000, 'static/img/product8.jpg'), ('Go Fourth Sample', 7, 10000, 'static/img/product9.jpg');"
+        volumeMounts:
+        - name: mysql-vol
+          mountPath: /var/lib/mysql
+      restartPolicy: Never
+      volumes:
+      - name: mysql-vol
+        emptyDir: {}
