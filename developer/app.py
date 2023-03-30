@@ -22,7 +22,7 @@ Session(app)
 
 dbconfig = {
     "pool_name": "mypool",
-    "pool_size": 20,
+    #"pool_size": 20,
     "host": os.environ.get('DBHOST'),
     "user": os.environ.get('DBUSER'),
     "password": os.environ.get('DBSECRET'),

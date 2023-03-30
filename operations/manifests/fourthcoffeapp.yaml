@@ -72,7 +72,7 @@ spec:
     app: fourthcoffee-app
   ports:
   - name: http
-    port: 5000
+    port: 80
     targetPort: 5000
 ---
 #Deployment for MySQL Pod using a custom container
