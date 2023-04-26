@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fc-cloudsync
+  namespace: fourthcoffee
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fc-cloudsync
+  template:
+    metadata:
+      labels:
+        app: fc-cloudsync
+    spec:
+      containers:
+      - name: fourthcoffee
+        image: bcacr.azurecr.io/fccloudsync:latest
+        env:
+        - name: DBHOST
+          valueFrom:
+            configMapKeyRef:
+              name: fc-configmap
+              key: db_host
+        - name: DBNAME
+          valueFrom: 
+            configMapKeyRef:
+              name: fc-configmap
+              key: db_name
+        - name: DBUSER
+          value: root
+        - name: DBSECRET
+          value: secret
+        - name: SYNCINTERVAL
+          value: '120'
