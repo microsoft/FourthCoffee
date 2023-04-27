@@ -133,3 +133,4 @@ virtual/
 flask_session/
 cloudsyncenv/
 helpers.txt
+*.local

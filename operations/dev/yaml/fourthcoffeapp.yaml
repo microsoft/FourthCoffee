@@ -131,7 +131,7 @@ data:
   db_host: my-db
   db_name: fourthcoffeedb
   CAMERAS_ENABLED: "False"
-  head_title: "El Jarocho"
+  head_title: "Fourth Coffee"
   db_enabled: "False"
   season: "default"
 ---
@@ -148,7 +148,7 @@ spec:
     spec:
       containers:
       - name: my-db
-        image: bcacr.azurecr.io/fourthcoffeedb/fourthcoffeedb:latest
+        image: mysql
         env:
         - name: MYSQL_HOST
           value: my-db

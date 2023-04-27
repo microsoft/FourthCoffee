@@ -33,3 +33,11 @@ spec:
           value: secret
         - name: SYNCINTERVAL
           value: '120'
+        - name: COSMOSENDPOINT
+          value: ''
+        - name: COSMOSKEY
+          value: ''
+        - name: COSMOSDB
+          value: ''
+        - name: COSMOSCONTAINER
+          value: ''    
