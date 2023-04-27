@@ -37,12 +37,12 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: fc-cloudsyncconfig
-              key:
+              key: cosmosendpoint
         - name: COSMOSKEY
           valueFrom:
             configMapKeyRef:
               name: fc-cloudsyncconfig
-              key: cosmosendpoint
+              key: cosmoskey
         - name: COSMOSDB
           valueFrom:
             configMapKeyRef:
@@ -52,4 +52,4 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: fc-cloudsyncconfig
-              key: cosmoskey
+              key: cosmoscontainer
