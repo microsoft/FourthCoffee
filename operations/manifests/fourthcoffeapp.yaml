@@ -147,7 +147,7 @@ spec:
       name: init-db
     spec:
       containers:
-      - name: my-db
+      - name: initdb
         image: mysql
         env:
         - name: MYSQL_HOST
