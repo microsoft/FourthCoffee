@@ -34,10 +34,22 @@ spec:
         - name: SYNCINTERVAL
           value: '120'
         - name: COSMOSENDPOINT
-          value: ''
+          valueFrom:
+            configMapKeyRef:
+              name: fc-cloudsyncconfig
+              key:
         - name: COSMOSKEY
-          value: ''
+          valueFrom:
+            configMapKeyRef:
+              name: fc-cloudsyncconfig
+              key: cosmosendpoint
         - name: COSMOSDB
-          value: ''
+          valueFrom:
+            configMapKeyRef:
+              name: fc-cloudsyncconfig
+              key: cosmosdb
         - name: COSMOSCONTAINER
-          value: ''    
+          valueFrom:
+            configMapKeyRef:
+              name: fc-cloudsyncconfig
+              key: cosmoskey
