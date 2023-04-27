@@ -10,11 +10,11 @@ username = os.environ.get('DBUSER')
 password = os.environ.get('DBSECRET')
 sync_interval = 120 #In seconds
 
-# Azure Cosmos DB connection settings
-endpoint = ''
-key = ''
-database_name = ''
-container_name = ''
+#Azure CosmosDB settings
+endpoint = os.environ.get('COSMOSENDPOINT')
+key = os.environ.get('COSMOSKEY')
+database_name = os.environ.get('COSMOSDB')
+container_name = os.environ.get('COSMOSCONTAINER')
 
 # Connect to MySQL
 cnxn = mysql.connector.connect(user=username, password=password, host=server, database=database)
