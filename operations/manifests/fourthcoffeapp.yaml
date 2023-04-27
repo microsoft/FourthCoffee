@@ -133,7 +133,7 @@ data:
   CAMERAS_ENABLED: "False"
   head_title: "Fourth Coffee"
   db_enabled: "False"
-  season: "winter"
+  season: "Winter"
 ---
 # Job to Initialize the Database / Only runs at the creating of the mysql pod
 apiVersion: batch/v1
